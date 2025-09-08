@@ -1,0 +1,28 @@
+
+
+/* styles/logout-button.css or inside a <style> block if using styled-components */
+.logout-btn {
+  height: 50px;
+  width: 100%;
+  max-width: 160px;
+  margin-top: 12px;
+  border-radius: 10px;
+  background: #f40909;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: -5px -5px 15px #f07878, 5px 5px 15px #f33d3d, inset 5px 5px 10px #f43333,
+    inset -5px -5px 10px #f60404;
+  font-family: "Damion", cursive;
+  cursor: pointer;
+  border: none;
+  font-size: 16px;
+  color: rgb(161, 161, 161);
+  transition: all 0.5s ease;
+}
+
+.logout-btn:hover {
+  box-shadow: -5px -5px 15px #e34343, 5px 5px 15px #222, inset 5px 5px 10px #ef0505,
+    inset -5px -5px 10px #f30707;
+  color: #d6d6d6;
+}
