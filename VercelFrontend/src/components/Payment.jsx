@@ -3,7 +3,7 @@ import React from "react";
 export default function PaymentButton() {
   const handlePayment = async () => {
     // 1. Create order
-    const res = await fetch("http://localhost:5000/api/v1/create-order", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/create-order`, {
       method: "POST",
     });
     const order = await res.json();
@@ -57,3 +57,4 @@ export default function PaymentButton() {
     </button>
   );
 }
+
