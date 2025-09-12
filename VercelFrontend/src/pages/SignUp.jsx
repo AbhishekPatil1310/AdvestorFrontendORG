@@ -104,33 +104,6 @@ export default function SignUp() {
             </>
           )}
 
-          {/* Role picker - Appears below Advertiser fields */}
-          <div className="flex items-center justify-between">
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="role"
-                value="user"
-                checked={form.role === 'user'}
-                onChange={handleChange}
-                className="accent-indigo-600"
-              />
-              <span>User</span>
-            </label>
-
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="role"
-                value="advertiser"
-                checked={form.role === 'advertiser'}
-                onChange={handleChange}
-                className="accent-indigo-600"
-              />
-              <span>Advertiser</span>
-            </label>
-          </div>
-
           {/* Submit */}
           <button
             type="submit"
@@ -172,3 +145,4 @@ export default function SignUp() {
     </section>
   );
 }
+
