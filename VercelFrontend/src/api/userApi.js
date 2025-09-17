@@ -49,4 +49,13 @@ export const getAffiliateAds = async () => {
     withCredentials: true,
   });
   return res.data;
+
+}
+
+export async function fetchUserCount() {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/UserCount`,{
+    withCredentials:true
+  });
+  console.log("in api: ",res.data)
+  return res.data.totalUsers;
 }
