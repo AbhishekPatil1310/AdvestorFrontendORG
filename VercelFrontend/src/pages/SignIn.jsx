@@ -1,20 +1,22 @@
-// pages/SignIn.jsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch } from '../store';
 import { login } from '../store/authSlice';
 import { useSelector } from 'react-redux';
 import GoogleSignInButton from '../components/GoogleSignInButton';
+import ForgotPasswordModal from '../components/ForgotPasswordModal';
 
 export default function SignIn() {
   const [form, setForm] = useState({
     email: '',
     password: '',
-    role: 'user' // default role
+    role: 'user'
   });
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((s) => s.auth);
+
+  const [showForgot, setShowForgot] = useState(false);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,8 +25,6 @@ export default function SignIn() {
     e.preventDefault();
     try {
       const result = await dispatch(login(form)).unwrap();
-      // const bannedUntil = user?.ban?.isBanned?.bannedUntil;
-
       if (result?.ban?.isBanned) {
         navigate('/banned');
       } else {
@@ -60,19 +60,27 @@ export default function SignIn() {
             className="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-600"
           />
 
-          {/* Role picker */}
-
+          {/* 🔹 Forgot password link */}
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="text-sm text-indigo-600 hover:underline"
+              onClick={() => setShowForgot(true)}
+            >
+              Forgot password?
+            </button>
+          </div>
 
           <button
             type="submit"
             disabled={status === 'loading'}
             className="w-full rounded bg-indigo-600 py-2 font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
           >
-            {status === 'loading' ? 'Signing in…' : 'Sign In'}
+            {status === 'loading' ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
 
-        {/* Divider - Only show for users, not advertisers */}
+        {/* Divider */}
         {form.role === 'user' && (
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
@@ -84,7 +92,7 @@ export default function SignIn() {
           </div>
         )}
 
-        {/* Google Sign In Button - Only show for users, not advertisers */}
+        {/* Google Sign In */}
         {form.role === 'user' && (
           <GoogleSignInButton text="Sign in with Google" />
         )}
@@ -98,6 +106,8 @@ export default function SignIn() {
           </Link>
         </p>
       </div>
+
+      {showForgot && <ForgotPasswordModal onClose={() => setShowForgot(false)} />}
     </section>
   );
 }
