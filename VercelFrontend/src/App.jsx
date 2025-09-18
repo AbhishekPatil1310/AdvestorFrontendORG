@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route,useLocation } from 'react-router-dom';
+import { useState,useEffect } from 'react';
 import PublicLayout from './layout/PublicLayout';
 import DashboardLayout from './layout/DashboardLayout';
 import Landing from './pages/Landing';
@@ -26,6 +27,7 @@ import VerifyOtp from './pages/VerifyOtp'
 import WithdrawalAdmin from './components/AdminWithdrawalPage.jsx'
 import WithdrawalForm from './components/Withdrawal.jsx'
 import ChatBox from './components/Chat.jsx'
+import Loader from './components/Loader.jsx';
 
 
 
@@ -33,8 +35,37 @@ import ChatBox from './components/Chat.jsx'
 const Empty = () => <div />;
 
 export default function App() {
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  useEffect(() => {
+    setLoading(true);
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500); // Adjust duration as needed
+
+    return () => clearTimeout(timer);
+  }, [location]);
+
+
   return (
     <>
+     {loading && (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(255,255,255,0.6)',
+          zIndex: 9999,
+        }}
+      >
+        <Loader />
+      </div>
+    )}
+
       <GlobalCreditWatcher />
       <Routes>
         {/* -------- PUBLIC -------- */}
