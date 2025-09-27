@@ -26,7 +26,6 @@ import Banned from './components/Banned';
 import VerifyOtp from './pages/VerifyOtp'
 import WithdrawalAdmin from './components/AdminWithdrawalPage.jsx'
 import WithdrawalForm from './components/Withdrawal.jsx'
-import ChatBox from './components/Chat.jsx'
 import Loader from './components/Loader.jsx';
 
 
@@ -114,7 +113,7 @@ export default function App() {
             <UserWallet />
           </ProtectedRoute>} />
           <Route path="chat" element={<ProtectedRoute>
-            <ChatBox />
+            < />
           </ProtectedRoute>} />
           <Route path="my-ads" element={<ProtectedRoute>
             <AdvertiserDashboard />
@@ -189,3 +188,4 @@ export default function App() {
     </>
   );
 }
+
