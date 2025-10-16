@@ -4,7 +4,8 @@ import React from 'react';
 const GoogleSignInButton = ({ text = "Continue with Google" }) => {
   const handleGoogleSignIn = () => {
     // Redirect to backend Google OAuth endpoint
-    window.location.href = 'http://localhost:4000/api/v1/auth/google';
+   const googleUri = `${import.meta.env.VITE_google_URL}`
+    window.location.href = googleUri;
   };
 
   return (
@@ -42,3 +43,4 @@ const GoogleSignInButton = ({ text = "Continue with Google" }) => {
 };
 
 export default GoogleSignInButton;
+
