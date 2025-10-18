@@ -27,8 +27,8 @@ import VerifyOtp from './pages/VerifyOtp'
 import WithdrawalAdmin from './components/AdminWithdrawalPage.jsx'
 import WithdrawalForm from './components/Withdrawal.jsx'
 import Loader from './components/Loader.jsx';
+import ChatPage from './pages/chatPage.jsx'
 import Chat from './components/chatme.jsx'
-
 
 
 /* empty stubs – replace later */
@@ -113,8 +113,12 @@ export default function App() {
           <Route path="wallet" element={<ProtectedRoute>
             <UserWallet />
           </ProtectedRoute>} />
-          <Route path="chat" element={<ProtectedRoute>
-            <Chat/>
+ 
+          <Route path="chatme" element={<ProtectedRoute>
+            <Chat />
+          </ProtectedRoute>} />
+          <Route path="chatPage/:id" element={<ProtectedRoute>
+            <ChatPage />
           </ProtectedRoute>} />
           <Route path="my-ads" element={<ProtectedRoute>
             <AdvertiserDashboard />
@@ -189,5 +193,3 @@ export default function App() {
     </>
   );
 }
-
-
