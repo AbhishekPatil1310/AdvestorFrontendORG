@@ -60,7 +60,7 @@ export default function ChatPage() {
 
   // WebSocket connection
   useEffect(() => {
-    ws.current = new WebSocket(""wss://microchatbackend.onrender.com/ws/chat"");
+    ws.current = new WebSocket("wss://microchatbackend.onrender.com/ws/chat");
 
     ws.current.onopen = () => console.log("WebSocket connected!");
     ws.current.onmessage = (event) => {
@@ -134,3 +134,4 @@ export default function ChatPage() {
     </div>
   );
 }
+
