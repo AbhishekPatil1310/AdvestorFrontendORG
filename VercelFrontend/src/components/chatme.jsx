@@ -1,168 +1,135 @@
-import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
-import { getAllUsers } from "../api/adminApi";
+import { useParams } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
-export default function Chat() {
-  const [socket, setSocket] = useState(null);
-  const [users, setUsers] = useState([]);
+export default function ChatPage() {
+  const { id: receiverId } = useParams(); // receiver id from URL
+  const user = useSelector((state) => state.auth.user); // logged-in user
+
+  const [messages, setMessages] = useState([]);
+  const [newMsg, setNewMsg] = useState("");
   const [receiver, setReceiver] = useState(null);
-  const [chat, setChat] = useState([]);
-  const [message, setMessage] = useState("");
-  const user = useSelector((state) => state.auth.user);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const ws = useRef(null);
 
-  // Fetch all users on mount
+  // Fetch receiver info
   useEffect(() => {
-    console.log("Current logged-in user:", user?._id);
-    const fetchUsers = async () => {
+    const fetchReceiver = async () => {
       try {
-        const data = await getAllUsers();
-        if (user.role == "admin") {
-          setUsers(data);
-        } else {
-          const adminUsers = data.filter((u) => u.role === "admin");
-          setUsers(adminUsers);
-        }
-      }
-
-      catch (err) {
-        console.error("❌ Error fetching users:", err);
+        const res = await fetch(`https://microchatbackend.onrender.com/users/${receiverId}`, {
+          credentials: "include", // send cookie
+        });
+        if (!res.ok) throw new Error("Failed to fetch receiver info");
+        const data = await res.json();
+        setReceiver(data.user);
+      } catch (err) {
+        console.error(err);
       }
     };
-    fetchUsers();
+
+    fetchReceiver();
+  }, [receiverId]);
+
+  // Fetch chat history
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch(
+          `https://microchatbackend.onrender.com/messages/history/${receiverId}`,
+          {
+            method: "GET",
+            credentials: "include", // crucial for cookie
+          }
+        );
+        if (!res.ok) throw new Error("Failed to fetch chat history");
+        const data = await res.json();
+        setMessages(data.messages || []);
+      } catch (err) {
+        console.error("Error fetching chat history:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, [receiverId]);
+
+  // WebSocket connection
+  useEffect(() => {
+    ws.current = new WebSocket(""wss://microchatbackend.onrender.com/ws/chat"");
+
+    ws.current.onopen = () => console.log("WebSocket connected!");
+    ws.current.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      setMessages((prev) => [...prev, msg]);
+    };
+    ws.current.onerror = (err) => console.error("WebSocket error:", err);
+    ws.current.onclose = () => console.log("WebSocket closed");
+
+    return () => ws.current?.close();
   }, []);
 
-  // Connect socket once
-  useEffect(() => {
-    const newSocket = io(`${import.meta.env.VITE_CHAT_BACKEND_URL}`, {
-      withCredentials: true,
-    });
+  const handleSend = () => {
+    if (!newMsg.trim() || !ws.current || ws.current.readyState !== WebSocket.OPEN)
+      return;
 
-    newSocket.on("connect", () => {
-      console.log("🟢 Connected to server with socket id:", newSocket.id);
-    });
-
-    newSocket.on("connect_error", (err) => {
-      console.error("❌ Socket connection error:", err.message);
-    });
-
-    newSocket.on("private_message", (data) => {
-      console.log("📩 Incoming message:", data);
-
-      // Map incoming message's from to "Me" or receiver.name based on logged-in user ID
-      setChat((prev) => [
-        ...prev,
-        {
-          from: data.from === user?._id ? "Me" : receiver?.name || "Unknown",
-          message: data.message,
-        },
-      ]);
-    });
-
-    setSocket(newSocket);
-
-    return () => newSocket.disconnect();
-  }, [user, receiver]);
-
-  // Fetch chat history when receiver changes or logged-in user changes
-  useEffect(() => {
-    if (!receiver || !user) return;
-
-    const fetchChatHistory = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_CHAT_BACKEND_URL}/api/chat/${receiver._id}`,
-          { credentials: "include" }
-        );
-        const data = await res.json();
-
-        // Map messages from/to logged-in user ID for "Me" labeling
-        const formatted = data.messages.map((msg) => ({
-          from: msg.from === user._id ? "Me" : receiver.name,
-          message: msg.message,
-        }));
-
-        setChat(formatted);
-      } catch (err) {
-        console.error("❌ Error fetching chat history:", err);
-        setChat([]);
-      }
+    const msg = {
+      sender_id: user._id,
+      receiver_id: receiverId,
+      content: newMsg,
+      timestamp: Date.now(),
     };
 
-    fetchChatHistory();
-
-    // Clear chat on receiver change for immediate UI feedback
-    return () => setChat([]);
-  }, [receiver, user]);
-
-  const sendMessage = () => {
-    if (!receiver || !message.trim() || !socket) return;
-
-    console.log("📤 Sending message:", { to: receiver._id, message });
-
-    socket.emit("private_message", { to: receiver._id, message });
-
-    setChat((prev) => [...prev, { from: "Me", message }]);
-    setMessage("");
+    ws.current.send(JSON.stringify(msg));
+    setMessages((prev) => [...prev, msg]); // optimistic update
+    setNewMsg("");
   };
 
+  if (loading) return <p className="text-gray-600">Loading messages...</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
+
   return (
-    <div className="flex h-screen">
-      {/* Sidebar Users */}
-      <div className="w-1/4 border-r p-4 overflow-y-auto">
-        <h2 className="font-bold text-lg mb-4">Users</h2>
-        {users.map((userItem) => (
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-white shadow-lg rounded-lg">
+      {/* Header */}
+      <div className="p-4 bg-indigo-600 text-white font-semibold">
+        Chat with {receiver?.name || "Loading..."}
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50">
+        {messages.map((m, i) => (
           <div
-            key={userItem._id}
-            onClick={() => setReceiver(userItem)}
-            className={`p-2 rounded cursor-pointer mb-2 ${receiver?._id === userItem._id ? "bg-blue-200" : "hover:bg-gray-200"
-              }`}
+            key={i}
+            className={`max-w-xs px-3 py-2 rounded-lg ${
+              m.sender_id === user._id
+                ? "bg-indigo-600 text-white self-end ml-auto"
+                : "bg-gray-200 text-gray-800 self-start mr-auto"
+            }`}
           >
-            {userItem.name} ({userItem.email})
+            {m.content}
           </div>
         ))}
       </div>
 
-      {/* Chat Window */}
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 p-4 overflow-y-auto">
-          {receiver ? (
-            <>
-              <h2 className="font-bold text-lg mb-4">Chat with {receiver.name}</h2>
-              {chat.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`mb-2 ${msg.from === "Me" ? "text-right" : "text-left"}`}
-                >
-                  <p>
-                    <strong>{msg.from}:</strong> {msg.message}
-                  </p>
-                </div>
-              ))}
-            </>
-          ) : (
-            <p className="text-gray-500">Select a user to start chatting</p>
-          )}
-        </div>
-
-        {/* Input box */}
-        {receiver && (
-          <div className="p-4 border-t flex gap-2">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="border p-2 rounded flex-1"
-            />
-            <button
-              onClick={sendMessage}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Send
-            </button>
-          </div>
-        )}
+      {/* Input */}
+      <div className="p-3 border-t flex gap-2">
+        <input
+          type="text"
+          value={newMsg}
+          onChange={(e) => setNewMsg(e.target.value)}
+          placeholder="Type a message..."
+          className="flex-1 border rounded-lg px-3 py-2 focus:ring focus:ring-indigo-200"
+        />
+        <button
+          onClick={handleSend}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+        >
+          Send
+        </button>
       </div>
     </div>
   );
