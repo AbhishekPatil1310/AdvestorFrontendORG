@@ -16,7 +16,7 @@ export default function Sidebar({ open, setOpen }) {
       { path: '/dashboard/upload', label: 'Upload Ad' },
       { path: '/dashboard/my-ads', label: 'Your Ads' },
       { path: '/dashboard/wallet', label: 'Wallet' },
-      { path: '/dashboard/Chat', label: 'Chat' },
+      { path: '/dashboard/Chatme', label: 'Chatme' },
       { path: '/dashboard/contact', label: 'Contact' },
     ];
   } else if (user?.role === 'admin') {
@@ -27,7 +27,7 @@ export default function Sidebar({ open, setOpen }) {
       { path: '/dashboard/contact', label: 'Contact' },
       { path: '/dashboard/AffiliateAds', label: 'Affiliate Ads' },
       { path: '/dashboard/withdrawal', label: 'withdrawal' },
-      { path: '/dashboard/Chat', label: 'Chat' },
+      { path: '/dashboard/Chatme', label: 'Chatme' },
     ];
   } else {
     items = [
@@ -37,7 +37,7 @@ export default function Sidebar({ open, setOpen }) {
       { path: '/dashboard/history', label: 'History' },
       { path: '/dashboard/contact', label: 'Contact' },
       { path: '/dashboard/withdrawa', label: 'withdraw' },
-      { path: '/dashboard/Chat', label: 'Chat' },
+      { path: '/dashboard/Chatme', label: 'Chatme' },
       { path: '/dashboard/Affiliate', label: 'Shope me' },
     ];
   }
