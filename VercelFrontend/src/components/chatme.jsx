@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import Cookies from "js-cookie"; // 👈 for reading JWT token
 import { getAllUsers } from "../api/adminApi";
 import { useSelector } from "react-redux";
 
@@ -13,33 +14,42 @@ export default function Chat() {
 
   // Fetch all users on mount
   useEffect(() => {
-    console.log("Current logged-in user:", user?._id);
     const fetchUsers = async () => {
       try {
         const data = await getAllUsers();
-        if (user.role == "admin") {
+        if (user?.role === "admin") {
           setUsers(data);
         } else {
           const adminUsers = data.filter((u) => u.role === "admin");
           setUsers(adminUsers);
         }
-      }
-
-      catch (err) {
+      } catch (err) {
         console.error("❌ Error fetching users:", err);
       }
     };
-    fetchUsers();
-  }, []);
+    if (user) fetchUsers();
+  }, [user]);
 
   // Connect socket once
   useEffect(() => {
-    const newSocket = io(`${import.meta.env.VITE_CHAT_BACKEND_URL}`, {
-      withCredentials: true,
+    if (!user) return;
+
+    const token = Cookies.get("accessToken"); // 👈 read token from cookie
+
+    if (!token) {
+      console.warn("⚠️ No access token found in cookies — socket auth will fail.");
+      return;
+    }
+
+    const newSocket = io(import.meta.env.VITE_CHAT_BACKEND_URL, {
+      auth: { token }, // 👈 send token here instead of relying on cookies
+      transports: ["websocket"], // ✅ ensures proper connection on production
     });
 
+    console.log("🔌 Attempting to connect to:", import.meta.env.VITE_CHAT_BACKEND_URL);
+
     newSocket.on("connect", () => {
-      console.log("🟢 Connected to server with socket id:", newSocket.id);
+      console.log("🟢 Connected to chat server:", newSocket.id);
     });
 
     newSocket.on("connect_error", (err) => {
@@ -49,7 +59,6 @@ export default function Chat() {
     newSocket.on("private_message", (data) => {
       console.log("📩 Incoming message:", data);
 
-      // Map incoming message's from to "Me" or receiver.name based on logged-in user ID
       setChat((prev) => [
         ...prev,
         {
@@ -64,7 +73,7 @@ export default function Chat() {
     return () => newSocket.disconnect();
   }, [user, receiver]);
 
-  // Fetch chat history when receiver changes or logged-in user changes
+  // Fetch chat history when receiver changes
   useEffect(() => {
     if (!receiver || !user) return;
 
@@ -72,12 +81,12 @@ export default function Chat() {
       try {
         const res = await fetch(
           `${import.meta.env.VITE_CHAT_BACKEND_URL}/api/chat/${receiver._id}`,
-          { credentials: "include" },
-          {withCredentials: true}
+          { credentials: "include" } // 👈 still send cookies for REST
         );
+        console.log("📡 Fetching chat history from microservice...");
+
         const data = await res.json();
 
-        // Map messages from/to logged-in user ID for "Me" labeling
         const formatted = data.messages.map((msg) => ({
           from: msg.from === user._id ? "Me" : receiver.name,
           message: msg.message,
@@ -91,8 +100,6 @@ export default function Chat() {
     };
 
     fetchChatHistory();
-
-    // Clear chat on receiver change for immediate UI feedback
     return () => setChat([]);
   }, [receiver, user]);
 
@@ -116,8 +123,11 @@ export default function Chat() {
           <div
             key={userItem._id}
             onClick={() => setReceiver(userItem)}
-            className={`p-2 rounded cursor-pointer mb-2 ${receiver?._id === userItem._id ? "bg-blue-200" : "hover:bg-gray-200"
-              }`}
+            className={`p-2 rounded cursor-pointer mb-2 ${
+              receiver?._id === userItem._id
+                ? "bg-blue-200"
+                : "hover:bg-gray-200"
+            }`}
           >
             {userItem.name} ({userItem.email})
           </div>
@@ -129,11 +139,15 @@ export default function Chat() {
         <div className="flex-1 p-4 overflow-y-auto">
           {receiver ? (
             <>
-              <h2 className="font-bold text-lg mb-4">Chat with {receiver.name}</h2>
+              <h2 className="font-bold text-lg mb-4">
+                Chat with {receiver.name}
+              </h2>
               {chat.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`mb-2 ${msg.from === "Me" ? "text-right" : "text-left"}`}
+                  className={`mb-2 ${
+                    msg.from === "Me" ? "text-right" : "text-left"
+                  }`}
                 >
                   <p>
                     <strong>{msg.from}:</strong> {msg.message}
@@ -168,4 +182,3 @@ export default function Chat() {
     </div>
   );
 }
-
