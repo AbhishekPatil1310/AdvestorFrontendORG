@@ -72,7 +72,8 @@ export default function Chat() {
       try {
         const res = await fetch(
           `${import.meta.env.VITE_CHAT_BACKEND_URL}/api/chat/${receiver._id}`,
-          { credentials: "include" }
+          { credentials: "include" },
+          {withCredentials: true}
         );
         const data = await res.json();
 
@@ -167,3 +168,4 @@ export default function Chat() {
     </div>
   );
 }
+
