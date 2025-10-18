@@ -17,7 +17,7 @@ export default function ChatPage() {
   useEffect(() => {
     const fetchReceiver = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/users/${receiverId}`, {
+        const res = await fetch(`https://microchatbackend.onrender.com/users/${receiverId}`, {
           credentials: "include", // send cookie
         });
         if (!res.ok) throw new Error("Failed to fetch receiver info");
@@ -38,7 +38,7 @@ export default function ChatPage() {
         setLoading(true);
         setError("");
         const res = await fetch(
-          `http://localhost:8000/messages/history/${receiverId}`,
+          `https://microchatbackend.onrender.com/messages/history/${receiverId}`,
           {
             method: "GET",
             credentials: "include", // crucial for cookie
@@ -60,7 +60,7 @@ export default function ChatPage() {
 
   // WebSocket connection
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8000/ws/chat");
+    ws.current = new WebSocket("wss://microchatbackend.onrender.com/ws/chat");
 
     ws.current.onopen = () => console.log("WebSocket connected!");
     ws.current.onmessage = (event) => {
@@ -134,3 +134,4 @@ export default function ChatPage() {
     </div>
   );
 }
+
