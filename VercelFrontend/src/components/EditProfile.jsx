@@ -24,7 +24,13 @@ const timeOptions = [
 
 const EditProfile = () => {
   const [user, setUser] = useState(null);
-  const [form, setForm] = useState({ interests: [], time: [] });
+  const [form, setForm] = useState({
+    interests: [],
+    time: [],
+    upiId: '',
+    name: '',
+    companyName: '',
+  });
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +42,9 @@ const EditProfile = () => {
         setForm({
           interests: Array.isArray(data.interests) ? data.interests : [],
           time: Array.isArray(data.time) ? data.time : [],
-          upiId: data.upiId || "",
+          upiId: data.upiId || '',
+          name: data.name || '',
+          companyName: data.companyName || '',
         });
       } catch (err) {
         console.error('Failed to fetch user profile', err);
@@ -52,6 +60,11 @@ const EditProfile = () => {
     setForm((prev) => ({ ...prev, [name]: values }));
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -65,7 +78,7 @@ const EditProfile = () => {
       if (error || !success) {
         setStatus(`❌ ${msg || 'Failed to update profile'}`);
       } else {
-        setStatus(`✅ ${msg}`);
+        setStatus(`✅ ${msg || 'Profile updated successfully'}`);
       }
     } catch (err) {
       console.error(err);
@@ -93,8 +106,41 @@ const EditProfile = () => {
           </p>
         </div>
 
-        {/* Preferred Time */}
+        {/* Name */}
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Full Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Enter your full name"
+            className="w-full border rounded px-3 py-2 focus:ring focus:ring-indigo-200"
+          />
+        </div>
+
+        {/* Company Name */}
+        {user.role == "advertiser" && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Company Name
+            </label>
+            <input
+              type="text"
+              name="companyName"
+              value={form.companyName}
+              onChange={handleChange}
+              placeholder="Enter your company name"
+              className="w-full border rounded px-3 py-2 focus:ring focus:ring-indigo-200"
+            />
+          </div>
+        )}
+
+{user.role = "user"&&(
+  <>
+  <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Preferred Time <span className="text-xs text-gray-500">(Select one or more)</span>
           </label>
@@ -106,10 +152,9 @@ const EditProfile = () => {
             onChange={(selected) => handleMultiChange(selected, 'time')}
             className="react-select-container"
             classNamePrefix="react-select"
-          />
+            />
         </div>
 
-        {/* Interests */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Interests <span className="text-xs text-gray-500">(Select one or more)</span>
@@ -122,24 +167,24 @@ const EditProfile = () => {
             onChange={(selected) => handleMultiChange(selected, 'interests')}
             className="react-select-container"
             classNamePrefix="react-select"
-          />
+            />
         </div>
-        {/* UPI ID Field */}
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             UPI ID <span className="text-xs text-gray-500">(e.g. name@upi)</span>
           </label>
           <input
             type="text"
-            value={form.upiId || ""}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, upiId: e.target.value }))
-            }
+            name="upiId"
+            value={form.upiId}
+            onChange={handleChange}
             placeholder="Enter your UPI ID"
             className="w-full border rounded px-3 py-2 focus:ring focus:ring-indigo-200"
-          />
+            />
         </div>
-
+  </>
+)}
 
         {/* Submit Button */}
         <button
@@ -153,7 +198,9 @@ const EditProfile = () => {
         {/* Status Message */}
         {status && (
           <div
-            className={`text-center text-sm font-medium px-4 py-2 rounded-md ${status.startsWith('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+            className={`text-center text-sm font-medium px-4 py-2 rounded-md ${status.startsWith('✅')
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
               }`}
           >
             {status}
@@ -165,4 +212,3 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
-
