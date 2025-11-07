@@ -16,7 +16,7 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-indigo-600">
-          <img src="/AdVestors.svg" alt="Logo" className="w-6 h-6" />
+          <img src="/Advestors.svg" alt="Logo" className="w-6 h-6" />
           Advestore
         </Link>
 
@@ -50,3 +50,4 @@ export default function Navbar() {
     </nav>
   );
 }
+
