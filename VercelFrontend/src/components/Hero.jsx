@@ -18,7 +18,7 @@ export default function Hero() {
           {/* Logo */}
           <Link to="/" className="flex justify-center lg:justify-start -mt-8">
             <img
-              src="/Advestor.svg"
+              src="/Advestors.svg"
               alt="AdVestor Logo"
               className="h-48 w-auto drop-shadow-2xl"
             />
@@ -50,3 +50,4 @@ export default function Hero() {
     </section>
   );
 }
+
