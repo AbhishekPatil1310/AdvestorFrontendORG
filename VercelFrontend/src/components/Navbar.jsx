@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 const anchors = [
   { id: 'home', label: 'Home' },
-  { id: 'about', label: 'About' },
 ];
 
 export default function Navbar() {
