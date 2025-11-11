@@ -11,32 +11,39 @@ export default function Chat() {
   const [message, setMessage] = useState("");
   const user = useSelector((state) => state.auth.user);
 
-  // Fetch all users on mount
+  // Fetch all users
   useEffect(() => {
     console.log("Current logged-in user:", user?._id);
     const fetchUsers = async () => {
       try {
         const data = await getAllUsers();
-        if (user.role == "admin") {
+        if (user.role === "admin") {
           setUsers(data);
         } else {
           const adminUsers = data.filter((u) => u.role === "admin");
           setUsers(adminUsers);
         }
-      }
-
-      catch (err) {
+      } catch (err) {
         console.error("❌ Error fetching users:", err);
       }
     };
     fetchUsers();
-  }, []);
+  }, [user]);
 
-  // Connect socket once
+  // Connect socket
   useEffect(() => {
-    const newSocket = io(`${import.meta.env.VITE_CHAT_BACKEND_URL}`, {
+    if (!user) return;
+
+    // ✅ Optional: fallback for browsers where Render strips cookies
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("accessToken="))
+      ?.split("=")[1];
+
+    const newSocket = io(import.meta.env.VITE_CHAT_BACKEND_URL, {
       withCredentials: true,
       transports: ["websocket"],
+      query: { token }, // 🔥 ensures auth even if cookies fail
     });
 
     newSocket.on("connect", () => {
@@ -49,8 +56,6 @@ export default function Chat() {
 
     newSocket.on("private_message", (data) => {
       console.log("📩 Incoming message:", data);
-
-      // Map incoming message's from to "Me" or receiver.name based on logged-in user ID
       setChat((prev) => [
         ...prev,
         {
@@ -61,11 +66,10 @@ export default function Chat() {
     });
 
     setSocket(newSocket);
-
     return () => newSocket.disconnect();
   }, [user, receiver]);
 
-  // Fetch chat history when receiver changes or logged-in user changes
+  // Fetch chat history
   useEffect(() => {
     if (!receiver || !user) return;
 
@@ -76,13 +80,10 @@ export default function Chat() {
           { credentials: "include" }
         );
         const data = await res.json();
-
-        // Map messages from/to logged-in user ID for "Me" labeling
         const formatted = data.messages.map((msg) => ({
           from: msg.from === user._id ? "Me" : receiver.name,
           message: msg.message,
         }));
-
         setChat(formatted);
       } catch (err) {
         console.error("❌ Error fetching chat history:", err);
@@ -91,8 +92,6 @@ export default function Chat() {
     };
 
     fetchChatHistory();
-
-    // Clear chat on receiver change for immediate UI feedback
     return () => setChat([]);
   }, [receiver, user]);
 
@@ -100,24 +99,25 @@ export default function Chat() {
     if (!receiver || !message.trim() || !socket) return;
 
     console.log("📤 Sending message:", { to: receiver._id, message });
-
     socket.emit("private_message", { to: receiver._id, message });
-
     setChat((prev) => [...prev, { from: "Me", message }]);
     setMessage("");
   };
 
   return (
     <div className="flex h-screen">
-      {/* Sidebar Users */}
+      {/* Sidebar */}
       <div className="w-1/4 border-r p-4 overflow-y-auto">
         <h2 className="font-bold text-lg mb-4">Users</h2>
         {users.map((userItem) => (
           <div
             key={userItem._id}
             onClick={() => setReceiver(userItem)}
-            className={`p-2 rounded cursor-pointer mb-2 ${receiver?._id === userItem._id ? "bg-blue-200" : "hover:bg-gray-200"
-              }`}
+            className={`p-2 rounded cursor-pointer mb-2 ${
+              receiver?._id === userItem._id
+                ? "bg-blue-200"
+                : "hover:bg-gray-200"
+            }`}
           >
             {userItem.name} ({userItem.email})
           </div>
@@ -129,11 +129,15 @@ export default function Chat() {
         <div className="flex-1 p-4 overflow-y-auto">
           {receiver ? (
             <>
-              <h2 className="font-bold text-lg mb-4">Chat with {receiver.name}</h2>
+              <h2 className="font-bold text-lg mb-4">
+                Chat with {receiver.name}
+              </h2>
               {chat.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`mb-2 ${msg.from === "Me" ? "text-right" : "text-left"}`}
+                  className={`mb-2 ${
+                    msg.from === "Me" ? "text-right" : "text-left"
+                  }`}
                 >
                   <p>
                     <strong>{msg.from}:</strong> {msg.message}
@@ -146,7 +150,7 @@ export default function Chat() {
           )}
         </div>
 
-        {/* Input box */}
+        {/* Input */}
         {receiver && (
           <div className="p-4 border-t flex gap-2">
             <input
@@ -168,4 +172,3 @@ export default function Chat() {
     </div>
   );
 }
-
