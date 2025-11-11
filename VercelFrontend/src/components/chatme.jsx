@@ -36,6 +36,7 @@ export default function Chat() {
   useEffect(() => {
     const newSocket = io(`${import.meta.env.VITE_CHAT_BACKEND_URL}`, {
       withCredentials: true,
+      transports: ["websocket"],
     });
 
     newSocket.on("connect", () => {
@@ -167,3 +168,4 @@ export default function Chat() {
     </div>
   );
 }
+
