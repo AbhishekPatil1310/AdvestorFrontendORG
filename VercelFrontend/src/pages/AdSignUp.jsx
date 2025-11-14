@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../store';
 import { Adregister } from '../store/authSlice';
-import GoogleSignInButton from '../components/GoogleSignInButton';
 
 // Helper component for cleaner input rendering
 const InputField = ({ name, type = 'text', placeholder, required = true, value, onChange }) => (
@@ -116,8 +115,7 @@ export default function AdSignUp() {
               </div>
             </div>
             
-            {/* Google Sign In Button */}
-            <GoogleSignInButton text="Sign up with Google" />
+
           </>
         )}
 
