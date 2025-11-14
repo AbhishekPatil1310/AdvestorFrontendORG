@@ -30,6 +30,7 @@ import Loader from './components/Loader.jsx';
 import Chat from './components/chatme.jsx'
 import TokenDisplay from './components/Test.jsx'
 import AdSignUp from './pages/AdSignUp.jsx'
+import AdSignIn from './pages/Adsignin.jsx'
 
 
 
@@ -78,6 +79,14 @@ export default function App() {
             element={
               <GuestRoute>
                 <SignIn />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="Adsignin"
+            element={
+              <GuestRoute>
+                <AdSignIn />
               </GuestRoute>
             }
           />

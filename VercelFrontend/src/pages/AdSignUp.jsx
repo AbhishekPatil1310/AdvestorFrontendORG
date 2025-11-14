@@ -125,7 +125,7 @@ export default function AdSignUp() {
         {/* Switch to sign‑in */}
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500 hover:underline transition duration-150">
+          <Link to="/Adsignin" className="font-medium text-indigo-600 hover:text-indigo-500 hover:underline transition duration-150">
             Sign In
           </Link>
         </p>

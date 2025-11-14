@@ -5,7 +5,7 @@ import { Adlogin } from '../store/authSlice';
 import { useSelector } from 'react-redux';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 
-export default function SignIn() {
+export default function AdSignIn() {
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -97,7 +97,7 @@ export default function SignIn() {
 
         <p className="mt-4 text-center text-sm">
           Don't have an account?{' '}
-          <Link to="/signup" className="text-indigo-600 hover:underline">
+          <Link to="/Adsignup" className="text-indigo-600 hover:underline">
             Sign Up
           </Link>
         </p>
