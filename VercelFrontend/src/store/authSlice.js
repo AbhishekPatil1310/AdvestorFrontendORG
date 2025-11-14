@@ -1,6 +1,6 @@
 // src/store/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginAPI, registerAPI, logoutAPI, currentUserAPI } from '../api/auth';
+import { loginAPI, registerAPI, logoutAPI, currentUserAPI,AdregisterAPI,AdloginAPI } from '../api/auth';
 
 /* ── THUNKS ─────────────────────────────────────────── */
 export const login = createAsyncThunk(
@@ -13,12 +13,32 @@ export const login = createAsyncThunk(
     }
   }
 );
+export const Adlogin = createAsyncThunk(
+  'auth/login/Ad',
+  async (cred, { rejectWithValue }) => {
+    try {
+      return await AdloginAPI(cred); // { id, email, role, ... }
+    } catch (err) {
+      return rejectWithValue(err.message || 'Login failed');
+    }
+  }
+);
 
 export const register = createAsyncThunk(
   'auth/register',
   async (data, { rejectWithValue }) => {
     try {
       return await registerAPI(data);
+    } catch (err) {
+      return rejectWithValue(err.message || 'Registration failed');
+    }
+  }
+);
+export const Adregister = createAsyncThunk(
+  'auth/register/Ad',
+  async (data, { rejectWithValue }) => {
+    try {
+      return await AdregisterAPI(data);
     } catch (err) {
       return rejectWithValue(err.message || 'Registration failed');
     }
@@ -84,9 +104,17 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, fulfilledWithUser)
       .addCase(login.rejected, rejected)
 
+      .addCase(Adlogin.pending, pending)
+      .addCase(Adlogin.fulfilled, fulfilledWithUser)
+      .addCase(Adlogin.rejected, rejected)
+
       .addCase(register.pending, pending)
       .addCase(register.fulfilled, fulfilledWithUser)
       .addCase(register.rejected, rejected)
+
+      .addCase(Adregister.pending, pending)
+      .addCase(Adregister.fulfilled, fulfilledWithUser)
+      .addCase(Adregister.rejected, rejected)
 
       .addCase(fetchCurrentUser.pending, pending)
       .addCase(fetchCurrentUser.fulfilled, fulfilledWithUser)

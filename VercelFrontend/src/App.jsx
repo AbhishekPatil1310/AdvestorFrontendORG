@@ -28,6 +28,9 @@ import WithdrawalAdmin from './components/AdminWithdrawalPage.jsx'
 import WithdrawalForm from './components/Withdrawal.jsx'
 import Loader from './components/Loader.jsx';
 import Chat from './components/chatme.jsx'
+import TokenDisplay from './components/Test.jsx'
+import AdSignUp from './pages/AdSignUp.jsx'
+
 
 
 /* empty stubs – replace later */
@@ -83,6 +86,14 @@ export default function App() {
             element={
               <GuestRoute>
                 <SignUp />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="Adsignup"
+            element={
+              <GuestRoute>
+                <AdSignUp />
               </GuestRoute>
             }
           />
@@ -144,6 +155,9 @@ export default function App() {
           <Route path="account" element={<Empty />} />
           <Route path="contact" element={<ProtectedRoute>
             <ContactForm />
+          </ProtectedRoute>} />
+          <Route path="test" element={<ProtectedRoute>
+            <TokenDisplay />
           </ProtectedRoute>} />
 
         </Route>

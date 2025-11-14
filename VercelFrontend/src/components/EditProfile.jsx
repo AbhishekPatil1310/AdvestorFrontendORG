@@ -170,7 +170,8 @@ const EditProfile = () => {
             />
         </div>
 
-        <div>
+{user.role == 'user' &&(
+          <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             UPI ID <span className="text-xs text-gray-500">(e.g. name@upi)</span>
           </label>
@@ -183,6 +184,7 @@ const EditProfile = () => {
             className="w-full border rounded px-3 py-2 focus:ring focus:ring-indigo-200"
             />
         </div>
+)}
   </>
 )}
 

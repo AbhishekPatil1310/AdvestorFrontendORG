@@ -59,3 +59,29 @@ export async function fetchUserCount() {
   console.log("in api: ",res.data)
   return res.data.totalUsers;
 }
+
+
+export async function fetchToken() {
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/Token`,
+      {}, // no body
+      { withCredentials: true }
+    );
+
+    console.log("token is:", res.data);
+
+    // ✅ Store token in localStorage if exists
+    if (res.data?.token) {
+      localStorage.setItem("accessToken", res.data.token);
+      console.log("Token saved to localStorage ✅");
+    } else {
+      console.warn("No token found in response ⚠️");
+    }
+
+    return res.data; // still return for use in components
+  } catch (err) {
+    console.error("Error fetching token:", err);
+    throw err; // rethrow so frontend can handle error
+  }
+}
