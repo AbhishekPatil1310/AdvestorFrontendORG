@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch } from '../store';
 import { Adlogin } from '../store/authSlice';
 import { useSelector } from 'react-redux';
-import GoogleSignInButton from '../components/GoogleSignInButton';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 
 export default function SignIn() {
@@ -92,10 +91,7 @@ export default function SignIn() {
           </div>
         )}
 
-        {/* Google Sign In */}
-        {form.role === 'advertiser' && (
-          <GoogleSignInButton text="Sign in with Google" />
-        )}
+
 
         {error && <p className="mt-4 text-center text-red-600">{error}</p>}
 
