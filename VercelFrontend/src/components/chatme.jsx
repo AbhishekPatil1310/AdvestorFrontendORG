@@ -11,6 +11,7 @@ export default function Chat() {
   const [message, setMessage] = useState("");
   const user = useSelector((state) => state.auth.user);
 
+
   // Fetch all users
   useEffect(() => {
     console.log("Current logged-in user:", user?._id);

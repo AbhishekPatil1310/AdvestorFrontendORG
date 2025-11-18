@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUserProfile } from '../api/getProfile';
-import { Mail, Clock, Heart, Edit, ArrowLeft,X } from 'lucide-react'; // Changed Pencil to Edit, added ArrowLeft
+import { Mail, Clock, Heart, MapPin, Edit, ArrowLeft, X } from 'lucide-react'; // Changed Pencil to Edit, added ArrowLeft
 import EditProfile from './EditProfile';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -151,6 +151,21 @@ export default function UserProfile() {
                 )}
               </motion.div>
             </div>
+            {/* Address Section */}
+            <div className="flex items-center gap-4 text-gray-700">
+              <div className="p-3 bg-green-100 rounded-full">
+                <MapPin className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-500">Address</h3>
+                {profile.Useraddress?.fullAddress ? (
+                  <span className="text-xl font-semibold">{profile.Useraddress.fullAddress}</span>
+                ) : (
+                  <span className="text-gray-500 italic">No address set yet</span>
+                )}
+              </div>
+            </div>
+
           </div>
         </motion.div>
       </div>
