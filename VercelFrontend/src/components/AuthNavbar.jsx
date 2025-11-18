@@ -60,10 +60,20 @@ export default function AuthNavbar({ setSidebarOpen }) {
           Advestore
         </h1>
 
-        <UserCircle
-          className="h-9 w-9 text-indigo-400 cursor-pointer transition-colors duration-300 hover:text-indigo-600"
-          onClick={() => navigate('/profile')}
-        />
+        {/* 👇 Show profile image if exists, otherwise the default icon */}
+        {user?.profilePhoto ? (
+          <img
+            src={user.profilePhoto}
+            alt="Profile"
+            className="h-10 w-10 rounded-full object-cover cursor-pointer border border-gray-200 shadow-sm"
+            onClick={() => navigate('/profile')}
+          />
+        ) : (
+          <UserCircle
+            className="h-9 w-9 text-indigo-400 cursor-pointer transition-colors duration-300 hover:text-indigo-600"
+            onClick={() => navigate('/profile')}
+          />
+        )}
       </div>
     </header>
   );
