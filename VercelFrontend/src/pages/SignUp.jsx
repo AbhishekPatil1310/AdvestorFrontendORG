@@ -13,6 +13,7 @@ export default function SignUp() {
   const [form, setForm] = useState({
     name: '',
     email: '',
+    gender: '',
     password: '',
     role: 'user',
     companyName: '', // <-- Added
@@ -67,6 +68,21 @@ export default function SignUp() {
             onChange={handleChange}
             className="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-600"
           />
+          {form.role === 'user' && (
+            <select
+              name="gender"
+              required
+              value={form.gender}
+              onChange={handleChange}
+              className="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-600"
+            >
+              <option value="" disabled>Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          )}
+
 
           {/* Password */}
           <input

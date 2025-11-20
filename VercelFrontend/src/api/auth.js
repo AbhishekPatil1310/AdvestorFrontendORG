@@ -7,6 +7,7 @@ export const loginAPI = async (cred) => {
 };
 
 export const registerAPI = async (data) => {
+  console.log('the gender is: ',data);
   const res = await apiRequest('/auth/register', { method: 'POST', body: data });
   return res.user; // ✅ only return the user object
 };
