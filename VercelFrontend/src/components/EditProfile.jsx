@@ -13,6 +13,7 @@ const interestOptions = [
   { value: 'cooking', label: 'Cooking' },
   { value: 'art', label: 'Art' },
   { value: 'technology', label: 'Technology' },
+  { value: 'education', label: 'Education' },
 ];
 
 const timeOptions = [
